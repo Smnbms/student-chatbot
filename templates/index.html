@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+<meta charset="UTF-8">
+<title>چت بات دانشجویی</title>
+
+<style>
+body {
+    font-family: Tahoma;
+    background: #F5F5F5;
+    direction: rtl;
+    text-align: right;
+}
+
+#chat-box {
+    width: 600px;
+    height: 400px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    overflow-y: scroll;
+    background: #fff;
+    margin-bottom: 10px;
+}
+
+.message-user {
+    background: #D0F0C0;
+    padding: 10px;
+    margin: 5px;
+    border-radius: 10px;
+}
+
+.message-bot {
+    background: #FFFFFF;
+    padding: 10px;
+    margin: 5px;
+    border-radius: 10px;
+}
+
+button {
+    padding: 8px;
+    margin: 5px;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+#send-btn { background: #4CAF50; }
+#all-btn { background: #2196F3; }
+#exit-btn { background: #f44336; }
+
+</style>
+</head>
+
+<body>
+
+<h2>🤖 چت بات دانشجویی دانشگاه</h2>
+
+<div id="chat-box"></div>
+
+<input type="text" id="user-input" placeholder="پیام خود را وارد کنید...">
+<button id="send-btn">ارسال</button>
+
+<br>
+
+<button id="all-btn">نمایش همه سوالات</button>
+<button id="exit-btn">خروج</button>
+
+<script>
+const chatBox = document.getElementById("chat-box");
+const userInput = document.getElementById("user-input");
+
+// افزودن پیام
+function addMessage(message, sender) {
+    const div = document.createElement("div");
+    div.textContent = message;
+    div.className = sender === "user" ? "message-user" : "message-bot";
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// پیام خوش‌آمدگویی
+addMessage("سلام! من چت بات واحد آموزش دانشگاه هستم 🤖", "bot");
+addMessage("می‌تونم به سوالات ثبت‌نام، انتخاب واحد و قوانین پاسخ بدم.", "bot");
+
+// ارسال پیام
+document.getElementById("send-btn").onclick = function () {
+    const msg = userInput.value.trim();
+    if (!msg) return;
+
+    addMessage("🧑 شما: " + msg, "user");
+    userInput.value = "";
+
+    fetch("/get_response", {
+        method: "POST",
+        headers: {"Content-Type": "application/x-www-form-urlencoded"},
+        body: "message=" + encodeURIComponent(msg)
+    })
+    .then(res => res.json())
+    .then(data => addMessage("🤖 " + data.response, "bot"));
+};
+
+// باز کردن صفحه سوالات
+document.getElementById("all-btn").onclick = function () {
+    window.open("/questions", "_blank");
+};
+
+// دکمه خروج
+document.getElementById("exit-btn").onclick = function () {
+    alert("برای خروج، تب را ببندید 😊");
+};
+
+// ارسال با Enter
+userInput.addEventListener("keypress", function(e) {
+    if (e.key === "Enter") {
+        document.getElementById("send-btn").click();
+    }
+});
+</script>
+
+</body>
+</html>
