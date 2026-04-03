@@ -1,4 +1,6 @@
 flask
+gunicorn
+pandas
+openpyxl
 scikit-learn
 numpy
-pandas
